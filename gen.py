@@ -27,6 +27,8 @@ class VideoGenerator:
         "mystery": 2
     }
 
+    GENRE_KEYS = list(GENRE.keys())
+
     VIDEO_TEMPLATE = {
         "id": "",
         "type": "",
@@ -74,45 +76,44 @@ class VideoGenerator:
     #####################################################
     @staticmethod
     def _random_genre():
-        return choice(*GENRE)
+        return choice(VideoGenerator.GENRE_KEYS)
 
     #####################################################
     def _generate_id(self, video):
         vt = video["type"]
         id_args = {
             "global_entry_num": self._global_id_num,
-            "genre": GENRE[video["genre"]]
+            "genre": VideoGenerator.GENRE[video["genre"]]
         }
 
         if vt == "episode":
             id_args["episode_num"] = video["episode_num"]
             id_args["season_num"] = video["season"]
 
-        id = VIDEO_TYPE[vt]["id_base"].format(**id_args)
+        id = VideoGenerator.VIDEO_TYPE[vt]["id_base"].format(**id_args)
         self._global_id_num += 1
         return id
 
     #####################################################
     def generate_video(self, video_type, extra_args=None):
-        if video_type not in VIDEO_TYPE:
+        if video_type not in VideoGenerator.VIDEO_TYPE:
             raise ValueError(
                 "Video type \"{}\" does not exist.".format(video_type))
-        if genre not in GENRE:
-            raise ValueError("Genre \"{}\" does not exist".format(genre))
 
-        new_video = VIDEO_TEMPLATE.copy()
+        new_video = VideoGenerator.VIDEO_TEMPLATE.copy()
         new_video["type"] = video_type
         new_video["name"] = self._random_video_name()
-        new_video["genre"] = _random_genre()
-        new_video["duration"] = randrange(*LENGTH[video_type])
-        new_video["ratings"] = [rating for rating in randrange(*NUM_RATINGS)]
-        new_video["duration"] = randrange(*LENGTH[video_type])
+        new_video["genre"] = VideoGenerator._random_genre()
+        new_video["duration"] = randrange(*VideoGenerator.LENGTH[video_type])
+        new_video["ratings"] = [
+            rating for rating in range(randrange(*VideoGenerator.NUM_RATINGS))]
+        new_video["duration"] = randrange(*VideoGenerator.LENGTH[video_type])
 
         if extra_args:
             for key, val in extra_args.items():
                 new_video[key] = val
 
-        new_video["id"] = _generate_id(new_video)
+        new_video["id"] = VideoGenerator._generate_id(new_video)
 
         return new_video
 
