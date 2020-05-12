@@ -81,7 +81,7 @@ class VideoGenerator:
         vt = video["type"]
         id_args = {
             "global_entry_num": self._global_id_num,
-            "genre" = GENRE[video["genre"]]
+            "genre": GENRE[video["genre"]]
         }
 
         if (vt == "episode"){
