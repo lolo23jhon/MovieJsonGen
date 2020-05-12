@@ -84,10 +84,9 @@ class VideoGenerator:
             "genre": GENRE[video["genre"]]
         }
 
-        if (vt == "episode"){
+        if vt == "episode":
             id_args["episode_num"] = video["episode_num"]
             id_args["season_num"] = video["season"]
-        }
 
         id = VIDEO_TYPE[vt]["id_base"].format(**id_args)
         self._global_id_num += 1
@@ -137,14 +136,14 @@ class VideoGenerator:
                         type="episode", extra_args=video_args))
         return videos
 
-    def write_file(self, num_moviesm num_series, filename="videos.json"):
+    def write_file(self, num_movies, num_series, filename="videos.json"):
         videos = self.generate_video_list(num_movies, num_series)
         videos_dict = {}
         for i, video in enumerate(videos):
             videos_dict[i+1] = video
 
-        with open(filename, "w") as file
-        json.dump(videos_dict, file)
+        with open(filename, "w") as file:
+            json.dump(videos_dict, file)
 
 
 if __name__ == "__main__":
@@ -155,9 +154,9 @@ if __name__ == "__main__":
                         help="video names input")
     parser.add_argument("-m", "--movies", required=True,
                         help="number of movies")
-    parser.add_argument("-s", "--series", requiered=True,
+    parser.add_argument("-s", "--series", required=True,
                         help="number of series")
 
-    args = vars(ap.parse_args())
+    args = vars(parser.parse_args())
 
     generator = VideoGenerator(args["input"])
