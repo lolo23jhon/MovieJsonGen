@@ -42,7 +42,7 @@ class VideoGenerator:
         "episode_num": 1,
     }
 
-    NUM_SEASONS = (1, 12)
+    NUM_SEASONS_PER_SERIES = (1, 12)
     NUM_EPISODES_PER_SEASON = (5, 30)
     NUM_RATINGS = (0, 251)
 
@@ -58,22 +58,36 @@ class VideoGenerator:
         self._video_names = [name for name in videos_json["names"]]
         self._global_id_num = 1
 
-    # TODO: implement generate_file_content
     #####################################################
-    def generate_file_content(num_movies, num_series):
-        videos = []
-        for t, num in videos_dict.itesm():
-            if t == "movie"
-            for _ in range(num):
-                videos.append(generate_video(video_type, video_args))
-
-            elif vt == "episode":
-                for i in range(num):
-                    num_ssns = randrange(*NUM_SEAONS)
-                    num_ssns_eps = randrange(*NUM_EPISODES_PER_SEASON)
+    def _random_video_name(self):
+        if not self._video_names:
+            raise RuntimeError("Names have not been loaded.")
+        return choice(self._video_names)
 
     #####################################################
-    def generate_video(self, video_type, name=choice(VIDEO_NAMES), genre=choice(GENRE), extra_args):
+    @staticmethod
+    def _random_genre():
+        return choice(*GENRE)
+
+    #####################################################
+    def _generate_id(self, video):
+        vt = video["type"]
+        id_args = {
+            "global_entry_num": self._global_id_num,
+            "genre" = GENRE[video["genre"]]
+        }
+
+        if (vt == "episode"){
+            id_args["episode_num"] = video["episode_num"]
+            id_args["season_num"] = video["season"]
+        }
+
+        id = VIDEO_TYPE[vt]["id_base"].format(**id_args)
+        self._global_id_num += 1
+        return id
+
+    #####################################################
+    def generate_video(self, video_type, extra_args):
         if video_type not in VIDEO_TYPE:
             raise ValueError(
                 "Video type \"{}\" does not exist.".format(video_type))
@@ -82,7 +96,8 @@ class VideoGenerator:
 
         new_video = VIDEO_TEMPLATE.copy()
         new_video["type"] = video_type
-        new_video["name"] = name
+        new_video["name"] = self._random_video_name()
+        new_video["genre"] = _random_genre()
         new_video["duration"] = randrange(*LENGTH[video_type])
         new_video["ratings"] = [rating for rating in randrange(*NUM_RATINGS)]
         new_video["duration"] = randrange(*LENGTH[video_type])
@@ -95,21 +110,28 @@ class VideoGenerator:
         return new_video
 
     #####################################################
-    def _generate_id(self, video)
-    vt = video["type"]
-    id_args = {
-        "global_entry_num": self._global_id_num,
-        "genre" = GENRE[video["genre"]]
-    }
+    def generate_video_list(self, num_movies, num_series):
+        videos = []
+        for _ in range(num_movies):
+            videos.append(self.generate_video(video_type))
 
-    if (vt == "episode"){
-        id_args["episode_num"] = video["episode_num"]
-        id_args["season_num"] = video["season"]
-    }
+        for _ in range(num_series):
+            num_ssns = randrange(*NUM_SEASONS_PER_SERIES)
+            num_ssns_eps = randrange(*NUM_EPISODES_PER_SEASON)
 
-    id = VIDEO_TYPE[vt]["id_base"].format(**id_args)
-    self._global_id_num += 1
-    return id
+            video_args = EPISODE_TEMPLATE_EXT.copy()
+            video_args["series"] = self._generate_series_name()
+
+            for ssn_num in range(num_ssns):
+                video_args["season_num"] = ssn_num
+                for ssn_ep_num in range(num_ssns_eps):
+                    video_args["episode_num"] = ssn_ep_num
+                    videos.append(self.generate_video(
+                        type="episode", extra_args=video_args))
+        return videos
+
+    def write_file(self, num_moviesm num_series, filename="videos.json"):
+        videos = self.generate_video_list(num_movies, num_series)
 
 
 if __name__ == "__main__":
