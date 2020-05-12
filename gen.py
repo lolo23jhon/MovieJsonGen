@@ -33,7 +33,7 @@ class VideoGenerator:
         "id": "",
         "type": "",
         "name": "",
-        "length": 0,
+        "duration": 0,
         "genre": "",
         "ratings": [],
     }
@@ -107,13 +107,12 @@ class VideoGenerator:
         new_video["duration"] = randrange(*VideoGenerator.LENGTH[video_type])
         new_video["ratings"] = [
             rating for rating in range(randrange(*VideoGenerator.NUM_RATINGS))]
-        new_video["duration"] = randrange(*VideoGenerator.LENGTH[video_type])
 
         if extra_args:
             for key, val in extra_args.items():
                 new_video[key] = val
 
-        new_video["id"] = VideoGenerator._generate_id(new_video)
+        new_video["id"] = self._generate_id(new_video)
 
         return new_video
 
@@ -124,10 +123,10 @@ class VideoGenerator:
             videos.append(self.generate_video("movie"))
 
         for _ in range(num_series):
-            num_ssns = randrange(*NUM_SEASONS_PER_SERIES)
-            num_ssns_eps = randrange(*NUM_EPISODES_PER_SEASON)
+            num_ssns = randrange(*VideoGenerator.NUM_SEASONS_PER_SERIES)
+            num_ssns_eps = randrange(*VideoGenerator.NUM_EPISODES_PER_SEASON)
 
-            video_args = EPISODE_TEMPLATE_EXT.copy()
+            video_args = VideoGenerator.EPISODE_TEMPLATE_EXT.copy()
             video_args["series"] = self._random_series_name()
 
             for ssn_num in range(num_ssns):
@@ -135,7 +134,7 @@ class VideoGenerator:
                 for ssn_ep_num in range(num_ssns_eps):
                     video_args["episode_num"] = ssn_ep_num
                     videos.append(self.generate_video(
-                        type="episode", extra_args=video_args))
+                        video_type="episode", extra_args=video_args))
         return videos
 
     def write_file(self, num_movies, num_series, filename="videos.json"):
@@ -149,24 +148,24 @@ class VideoGenerator:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-o", "--filename", required=True,
-                        help="output filename")
-    parser.add_argument("-i", "--input", required=True,
-                        help="video names input")
-    parser.add_argument("-m", "--movies", required=True,
-                        help="number of movies", type=int)
-    parser.add_argument("-s", "--series", required=True,
-                        help="number of series", type=int)
+    # parser = argparse.ArgumentParser()
+    # parser.add_argument("-o", "--filename", required=True,
+    #                     help="output filename")
+    # parser.add_argument("-i", "--input", required=True,
+    #                     help="video names input")
+    # parser.add_argument("-m", "--movies", required=True,
+    #                     help="number of movies", type=int)
+    # parser.add_argument("-s", "--series", required=True,
+    #                     help="number of series", type=int)
 
-    args = vars(parser.parse_args())
+    # args = vars(parser.parse_args())
 
-    # args = {
-    #     "input": "video_names.json",
-    #     "filename": "test.json",
-    #     "movies": 5,
-    #     "series": 2
-    # }
+    args = {
+        "input": "video_names.json",
+        "filename": "test.json",
+        "movies": 5,
+        "series": 2
+    }
 
     generator = VideoGenerator(args["input"])
     generator.write_file(
