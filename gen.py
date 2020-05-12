@@ -78,7 +78,7 @@ class Video:
         self._video_names = [name for name in videos_json["names"]]
         self._last_id = 1
 
-    def generate_video(video_type, name=choice(VIDEO_NAMES), genre=choice(GENRE), season=None, series=None):
+    def generate_video(video_type, name=choice(VIDEO_NAMES), genre=choice(GENRE), extra_args):
         if video_type not in VIDEO_TYPE:
             raise ValueError(
                 "Video type \"{}\" does not exist.".format(video_type))
@@ -92,6 +92,11 @@ class Video:
         new_video["ratings"] = [rating for rating in randrange(*NUM_RATINGS)]
         new_video["duration"] = randrange(*LENGTH[video_type])
         new_video["id"] = _generate_id(new_video)
+
+        for key, val in extra_args.val():
+            new_video[key] = val
+
+        return new_video
 
 
 if __name__ == "__main__":
