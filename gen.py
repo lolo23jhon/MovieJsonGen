@@ -93,7 +93,7 @@ class VideoGenerator:
         return id
 
     #####################################################
-    def generate_video(self, video_type, extra_args):
+    def generate_video(self, video_type, extra_args=None):
         if video_type not in VIDEO_TYPE:
             raise ValueError(
                 "Video type \"{}\" does not exist.".format(video_type))
@@ -108,8 +108,9 @@ class VideoGenerator:
         new_video["ratings"] = [rating for rating in randrange(*NUM_RATINGS)]
         new_video["duration"] = randrange(*LENGTH[video_type])
 
-        for key, val in extra_args.items():
-            new_video[key] = val
+        if extra_args:
+            for key, val in extra_args.items():
+                new_video[key] = val
 
         new_video["id"] = _generate_id(new_video)
 
@@ -119,7 +120,7 @@ class VideoGenerator:
     def generate_video_list(self, num_movies, num_series):
         videos = []
         for _ in range(num_movies):
-            videos.append(self.generate_video(video_type))
+            videos.append(self.generate_video("movie"))
 
         for _ in range(num_series):
             num_ssns = randrange(*NUM_SEASONS_PER_SERIES)
@@ -153,10 +154,20 @@ if __name__ == "__main__":
     parser.add_argument("-i", "--input", required=True,
                         help="video names input")
     parser.add_argument("-m", "--movies", required=True,
-                        help="number of movies")
+                        help="number of movies", type=int)
     parser.add_argument("-s", "--series", required=True,
-                        help="number of series")
+                        help="number of series", type=int)
 
     args = vars(parser.parse_args())
 
+    # args = {
+    #     "input": "video_names.json",
+    #     "filename": "test.json",
+    #     "movies": 5,
+    #     "series": 2
+    # }
+
     generator = VideoGenerator(args["input"])
+    generator.write_file(
+        filename=args["filename"], num_movies=args["movies"], num_series=args["series"])
+    print("Wrote file {}.".format(args["filename"]))
