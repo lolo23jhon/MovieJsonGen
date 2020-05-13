@@ -18,7 +18,7 @@ class VideoGenerator:
 
     LENGTH = {
         "movie": (5400, 9000),
-        "episode": (10, 3600)
+        "episode": (1000, 3600)
     }
 
     GENRE = {
@@ -40,13 +40,13 @@ class VideoGenerator:
 
     EPISODE_TEMPLATE_EXT = {
         "series": "",
-        "season": 1,
+        "season_num": 1,
         "episode_num": 1,
     }
 
-    NUM_SEASONS_PER_SERIES = (1, 6)
-    NUM_EPISODES_PER_SEASON = (5, 25)
-    NUM_RATINGS = (0, 251)
+    NUM_SEASONS_PER_SERIES = (1, 5)
+    NUM_EPISODES_PER_SEASON = (5, 12)
+    NUM_RATINGS = (0, 25)
     RATING_SCALE = (0, 5)
 
     #####################################################
@@ -89,7 +89,7 @@ class VideoGenerator:
 
         if vt == "episode":
             id_args["episode_num"] = video["episode_num"]
-            id_args["season_num"] = video["season"]
+            id_args["season_num"] = video["season_num"]
 
         id = VideoGenerator.VIDEO_TYPE[vt]["id_base"].format(**id_args)
         self._global_id_num += 1
@@ -133,9 +133,9 @@ class VideoGenerator:
             video_args["series"] = self._random_series_name()
 
             for ssn_num in range(num_ssns):
-                video_args["season_num"] = ssn_num
+                video_args["season_num"] = ssn_num + 1
                 for ssn_ep_num in range(num_ssns_eps):
-                    video_args["episode_num"] = ssn_ep_num
+                    video_args["episode_num"] = ssn_ep_num + 1
                     videos.append(self.generate_video(
                         video_type="episode", extra_args=video_args))
         return videos
