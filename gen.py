@@ -1,6 +1,6 @@
 import json
 import argparse
-from random import choice, randrange, uniform
+from random import choice, randrange, uniform, shuffle
 
 
 class VideoGenerator:
@@ -59,7 +59,11 @@ class VideoGenerator:
             videos_json = json.load(file)
 
         self._video_names = [name for name in videos_json["video_names"]]
+        shuffle(self._video_names)
         self._series_names = [name for name in videos_json["series_names"]]
+        self._num_series_names = len(self._series_names)
+        self._num_generated_series_names = 0
+        shuffle(self._series_names)
         self._global_id_num = 1
 
     #####################################################
@@ -72,7 +76,12 @@ class VideoGenerator:
     def _random_series_name(self):
         if not self._series_names:
             raise RuntimeError("Names have not been loaded.")
-        return choice(self._series_names)
+
+        if self._num_series_names == self._num_generated_series_names:
+            print("Warning: exhausted series names, some will be repeated")
+
+        self._num_generated_series_names += 1
+        return self._series_names[self._num_generated_series_names - 1]
 
     #####################################################
     @staticmethod
